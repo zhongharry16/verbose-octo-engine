@@ -1,0 +1,2376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语文口语交际情境模拟与智能测评系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #2ecc71;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --warning-color: #e74c3c;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .nav-link.active {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .scene-card {
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .scene-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        
+        .scene-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .speech-bubble {
+            background-color: var(--light-color);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .speech-bubble.student {
+            background-color: #e3f2fd;
+            margin-left: 20%;
+        }
+        
+        .speech-bubble.ai {
+            background-color: #f0f4f8;
+            margin-right: 20%;
+        }
+        
+        .radar-chart {
+            height: 400px;
+            width: 100%;
+        }
+        
+        .progress {
+            height: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .dashboard-card {
+            height: 100%;
+        }
+        
+        .heatmap-cell {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin: 2px;
+            border-radius: 3px;
+        }
+        
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .heatmap-legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .heatmap-legend-color {
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .sidebar {
+            background-color: var(--dark-color);
+            color: white;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        
+        .role-selector {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        
+        .role-card {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            margin: 0 5px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .role-card:hover, .role-card.active {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .task-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--warning-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 768px) {
+            .radar-chart {
+                height: 300px;
+            }
+            
+            .speech-bubble.student, .speech-bubble.ai {
+                margin-left: 10%;
+                margin-right: 10%;
+            }
+            
+            .sidebar {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div id="login-page" class="container">
+        <div class="login-container">
+            <div class="text-center mb-4">
+                <h2 class="text-primary">口语智能帮</h2>
+                <p class="text-muted">语文口语交际情境模拟与智能测评系统</p>
+            </div>
+            
+            <div class="mb-4">
+                <h5 class="text-center">选择登录身份</h5>
+                <div class="role-selector">
+                    <div class="role-card active" data-role="student">
+                        <div class="role-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>学生</div>
+                    </div>
+                    <div class="role-card" data-role="teacher">
+                        <div class="role-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div>教师</div>
+                    </div>
+                    <div class="role-card" data-role="admin">
+                        <div class="role-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div>管理员</div>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="login-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名</label>
+                    <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" class="form-control" id="password" placeholder="请输入密码">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember">
+                    <label class="form-check-label" for="remember">记住密码</label>
+                </div>
+                <button type="button" class="btn btn-primary w-100" onclick="login()">登录</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <small class="text-muted">适配广西智慧教育平台</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学生端主页面 -->
+    <div id="student-dashboard" class="d-none">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" href="#">口语智能帮 - 学生端</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showStudentSection('home')">首页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showStudentSection('scenes')">场景练习</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showStudentSection('reports')">测评报告</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showStudentSection('resources')">练习资源</a>
+                        </li>
+                    </ul>
+                    <div class="navbar-nav">
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> 张三
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">个人资料</a></li>
+                                <li><a class="dropdown-item" href="#">修改密码</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="logout()">退出登录</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 学生端内容 -->
+        <div class="container mt-4">
+            <!-- 首页 -->
+            <div id="student-home" class="student-section">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2>欢迎回来，张三同学！</h2>
+                        <p class="text-muted">继续练习，提升口语交际能力</p>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>待完成任务</span>
+                                <a href="#" class="text-light" onclick="showStudentSection('scenes')">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="task-card card p-3 mb-3 position-relative">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5>校园演讲 - "我的梦想"主题</h5>
+                                            <p class="text-muted mb-0">王老师布置 · 截止日期：2025-10-30</p>
+                                        </div>
+                                        <button class="btn btn-primary" onclick="selectScene('校园演讲')">开始练习</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="task-card card p-3 position-relative">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5>家庭沟通 - "与父母商量周末计划"</h5>
+                                            <p class="text-muted mb-0">李老师布置 · 截止日期：2025-11-05</p>
+                                        </div>
+                                        <button class="btn btn-outline-primary" onclick="selectScene('家庭沟通')">开始练习</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                学习数据概览
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-4">
+                                    <h3 class="text-primary">76.5</h3>
+                                    <p class="text-muted">口语能力综合评分</p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>语言流畅度</span>
+                                        <span>82</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 82%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>逻辑清晰度</span>
+                                        <span>65</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" role="progressbar" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>情感表达</span>
+                                        <span>73</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 73%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>用词准确性</span>
+                                        <span>78</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                推荐练习场景
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-school"></i>
+                                            </div>
+                                            <h5>校园演讲</h5>
+                                            <p class="text-muted">模拟校园演讲场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('校园演讲')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-home"></i>
+                                            </div>
+                                            <h5>家庭沟通</h5>
+                                            <p class="text-muted">模拟家庭沟通场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('家庭沟通')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-landmark"></i>
+                                            </div>
+                                            <h5>景点讲解</h5>
+                                            <p class="text-muted">模拟导游讲解场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('景点讲解')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <h5>小组讨论</h5>
+                                            <p class="text-muted">模拟小组讨论场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('小组讨论')">开始练习</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 场景练习 -->
+            <div id="student-scenes" class="student-section d-none">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2>口语交际场景练习</h2>
+                        <p class="text-muted">选择场景，与AI智能体互动，提升口语交际能力</p>
+                    </div>
+                </div>
+                
+                <!-- 场景选择 -->
+                <div class="row mb-4">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                选择练习场景
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-school"></i>
+                                            </div>
+                                            <h5>校园演讲</h5>
+                                            <p class="text-muted">模拟校园演讲场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('校园演讲')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-home"></i>
+                                            </div>
+                                            <h5>家庭沟通</h5>
+                                            <p class="text-muted">模拟家庭沟通场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('家庭沟通')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-landmark"></i>
+                                            </div>
+                                            <h5>景点讲解</h5>
+                                            <p class="text-muted">模拟导游讲解场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('景点讲解')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <h5>小组讨论</h5>
+                                            <p class="text-muted">模拟小组讨论场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('小组讨论')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-briefcase"></i>
+                                            </div>
+                                            <h5>职场沟通</h5>
+                                            <p class="text-muted">模拟职场沟通场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('职场沟通')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-gavel"></i>
+                                            </div>
+                                            <h5>辩论攻防</h5>
+                                            <p class="text-muted">模拟辩论场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('辩论攻防')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-comments"></i>
+                                            </div>
+                                            <h5>日常对话</h5>
+                                            <p class="text-muted">模拟日常对话场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('日常对话')">开始练习</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card scene-card text-center p-3">
+                                            <div class="scene-icon">
+                                                <i class="fas fa-user-tie"></i>
+                                            </div>
+                                            <h5>求职面试</h5>
+                                            <p class="text-muted">模拟求职面试场景</p>
+                                            <button class="btn btn-primary btn-sm" onclick="selectScene('求职面试')">开始练习</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 场景模拟交互 -->
+                <div class="row mb-4" id="scene-interaction" style="display: none;">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span id="current-scene">场景名称</span>
+                                <button class="btn btn-sm btn-outline-light" onclick="endScene()">结束练习</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="dialogue-container" style="height: 300px; overflow-y: auto; padding: 10px;">
+                                    <!-- 对话内容将动态添加 -->
+                                </div>
+                                <div class="mt-3">
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-primary" id="record-btn" onclick="toggleRecording()">
+                                            <i class="fas fa-microphone"></i> 开始录音
+                                        </button>
+                                        <input type="text" class="form-control" placeholder="或直接输入文本..." id="text-input">
+                                        <button class="btn btn-primary" onclick="sendMessage()">发送</button>
+                                    </div>
+                                    <div class="mt-2 text-center">
+                                        <small class="text-muted" id="recording-status">点击"开始录音"按钮进行语音输入</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 测评报告 -->
+            <div id="student-reports" class="student-section d-none">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2>口语测评报告</h2>
+                        <p class="text-muted">查看历史测评结果和改进建议</p>
+                    </div>
+                </div>
+                
+                <!-- 历史报告列表 -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                历史测评记录
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item list-group-item-action active" onclick="showReport('report1')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">校园演讲 - "我的梦想"</h6>
+                                            <small>2025-10-25</small>
+                                        </div>
+                                        <p class="mb-1">综合得分: 73.8</p>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action" onclick="showReport('report2')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">家庭沟通 - "周末计划"</h6>
+                                            <small>2025-10-20</small>
+                                        </div>
+                                        <p class="mb-1">综合得分: 80.2</p>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action" onclick="showReport('report3')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">景点讲解 - "桂林山水"</h6>
+                                            <small>2025-10-15</small>
+                                        </div>
+                                        <p class="mb-1">综合得分: 76.5</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                测评报告详情
+                            </div>
+                            <div class="card-body">
+                                <div id="report-details">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                                        <p>请从左侧选择一项测评记录查看详情</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 练习资源 -->
+            <div id="student-resources" class="student-section d-none">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2>个性化练习资源</h2>
+                        <p class="text-muted">根据你的测评结果推荐的练习内容</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                逻辑框架梳理
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">演讲逻辑模板</h5>
+                                <p class="card-text">针对"逻辑清晰度"薄弱的专项练习资源</p>
+                                <ul>
+                                    <li>开场问候 - 主题阐述 - 结尾总结 结构解析</li>
+                                    <li>梦想类演讲逻辑框架模板</li>
+                                    <li>观点-论据-结论三段式练习</li>
+                                </ul>
+                                <button class="btn btn-primary">开始练习</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                情感表达训练
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">情感词汇积累</h5>
+                                <p class="card-text">针对"情感表达"薄弱的专项练习资源</p>
+                                <ul>
+                                    <li>情感表达词汇分类学习</li>
+                                    <li>语调与节奏变化练习</li>
+                                    <li>肢体语言配合训练</li>
+                                </ul>
+                                <button class="btn btn-primary">开始练习</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                断句与节奏
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">逐句跟读训练</h5>
+                                <p class="card-text">针对"语言流畅度"提升的专项练习</p>
+                                <ul>
+                                    <li>语速控制练习</li>
+                                    <li>停顿与断句技巧</li>
+                                    <li>演讲节奏变化训练</li>
+                                </ul>
+                                <button class="btn btn-primary">开始练习</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                用词准确性
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">语文课标词汇练习</h5>
+                                <p class="card-text">针对"用词准确性"提升的专项练习</p>
+                                <ul>
+                                    <li>易混淆词汇辨析</li>
+                                    <li>成语使用场景练习</li>
+                                    <li>口语表达词汇扩展</li>
+                                </ul>
+                                <button class="btn btn-primary">开始练习</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教师端主页面 -->
+    <div id="teacher-dashboard" class="d-none">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-md-2 sidebar p-0">
+                    <div class="p-3 text-center border-bottom">
+                        <h5>口语智能帮</h5>
+                        <small>教师端</small>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showTeacherSection('overview')">
+                                <i class="fas fa-tachometer-alt"></i> 数据概览
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showTeacherSection('classes')">
+                                <i class="fas fa-users"></i> 班级管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showTeacherSection('tasks')">
+                                <i class="fas fa-tasks"></i> 任务布置
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showTeacherSection('reports')">
+                                <i class="fas fa-chart-bar"></i> 学情报告
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showTeacherSection('resources')">
+                                <i class="fas fa-book"></i> 教学资源
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> 退出登录
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 主内容区 -->
+                <div class="col-md-10">
+                    <!-- 顶部导航 -->
+                    <nav class="navbar navbar-light bg-light">
+                        <div class="container-fluid">
+                            <span class="navbar-brand mb-0 h1">教师工作台</span>
+                            <div class="d-flex">
+                                <div class="dropdown me-3">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-bell"></i>
+                                        <span class="notification-badge">3</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">张三完成了"校园演讲"练习</a></li>
+                                        <li><a class="dropdown-item" href="#">李四请求练习资源</a></li>
+                                        <li><a class="dropdown-item" href="#">班级平均分提升5.2分</a></li>
+                                    </ul>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-circle"></i> 王老师
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">个人资料</a></li>
+                                        <li><a class="dropdown-item" href="#">账号设置</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    
+                    <div class="p-4">
+                        <!-- 数据概览 -->
+                        <div id="teacher-overview" class="teacher-section">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>数据概览</h2>
+                                    <p class="text-muted">查看班级口语能力整体情况</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>班级平均分</h5>
+                                        <h3 class="text-primary">73.5</h3>
+                                        <p class="text-muted">较上月 +5.2分</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>练习完成率</h5>
+                                        <h3 class="text-success">87%</h3>
+                                        <p class="text-muted">35/40名学生</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>薄弱维度</h5>
+                                        <h3 class="text-warning">逻辑清晰度</h3>
+                                        <p class="text-muted">65%学生未达标</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>最常练习场景</h5>
+                                        <h3 class="text-info">校园演讲</h3>
+                                        <p class="text-muted">占总练习42%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            班级口语能力趋势
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="trend-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            能力维度分布
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="dimension-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            班级口语能力热力图
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="heatmap-container">
+                                                <!-- 热力图内容将动态生成 -->
+                                            </div>
+                                            <div class="heatmap-legend">
+                                                <div class="heatmap-legend-item">
+                                                    <div class="heatmap-legend-color" style="background-color: #d73027;"></div>
+                                                    <span>需加强 (0-60分)</span>
+                                                </div>
+                                                <div class="heatmap-legend-item">
+                                                    <div class="heatmap-legend-color" style="background-color: #fee08b;"></div>
+                                                    <span>一般 (60-80分)</span>
+                                                </div>
+                                                <div class="heatmap-legend-item">
+                                                    <div class="heatmap-legend-color" style="background-color: #1a9850;"></div>
+                                                    <span>良好 (80-100分)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 班级管理 -->
+                        <div id="teacher-classes" class="teacher-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>班级管理</h2>
+                                    <p class="text-muted">管理班级和学生信息</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <span>班级列表</span>
+                                            <button class="btn btn-primary btn-sm">创建新班级</button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>班级名称</th>
+                                                            <th>学生人数</th>
+                                                            <th>平均分</th>
+                                                            <th>练习完成率</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>初三(1)班</td>
+                                                            <td>40</td>
+                                                            <td>73.5</td>
+                                                            <td>87%</td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">查看详情</button>
+                                                                <button class="btn btn-sm btn-outline-secondary">管理学生</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>初三(2)班</td>
+                                                            <td>38</td>
+                                                            <td>69.8</td>
+                                                            <td>76%</td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">查看详情</button>
+                                                                <button class="btn btn-sm btn-outline-secondary">管理学生</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 任务布置 -->
+                        <div id="teacher-tasks" class="teacher-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>任务布置</h2>
+                                    <p class="text-muted">为学生布置口语练习任务</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            创建新任务
+                                        </div>
+                                        <div class="card-body">
+                                            <form>
+                                                <div class="mb-3">
+                                                    <label class="form-label">任务名称</label>
+                                                    <input type="text" class="form-control" placeholder="例如：校园演讲练习">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">选择场景</label>
+                                                    <select class="form-select">
+                                                        <option selected>请选择场景</option>
+                                                        <option value="1">校园演讲</option>
+                                                        <option value="2">家庭沟通</option>
+                                                        <option value="3">景点讲解</option>
+                                                        <option value="4">小组讨论</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">任务描述</label>
+                                                    <textarea class="form-control" rows="3" placeholder="描述任务要求和目标"></textarea>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">开始日期</label>
+                                                            <input type="date" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">截止日期</label>
+                                                            <input type="date" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">选择班级</label>
+                                                    <div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="checkbox" id="class1" checked>
+                                                            <label class="form-check-label" for="class1">初三(1)班</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="checkbox" id="class2">
+                                                            <label class="form-check-label" for="class2">初三(2)班</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">发布任务</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            已发布任务
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="list-group">
+                                                <a href="#" class="list-group-item list-group-item-action">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h6 class="mb-1">校园演讲 - "我的梦想"</h6>
+                                                        <small>2025-10-25</small>
+                                                    </div>
+                                                    <p class="mb-1">初三(1)班 · 完成率 87%</p>
+                                                </a>
+                                                <a href="#" class="list-group-item list-group-item-action">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h6 class="mb-1">家庭沟通 - "周末计划"</h6>
+                                                        <small>2025-10-20</small>
+                                                    </div>
+                                                    <p class="mb-1">初三(1)班 · 完成率 92%</p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 学情报告 -->
+                        <div id="teacher-reports" class="teacher-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>学情报告</h2>
+                                    <p class="text-muted">查看详细的学生测评数据和报告</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <span>学生口语能力详情</span>
+                                            <button class="btn btn-sm btn-primary">导出报告</button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>学生姓名</th>
+                                                            <th>语言流畅度</th>
+                                                            <th>逻辑清晰度</th>
+                                                            <th>情感表达</th>
+                                                            <th>用词准确性</th>
+                                                            <th>综合得分</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>张三</td>
+                                                            <td>85</td>
+                                                            <td>60</td>
+                                                            <td>70</td>
+                                                            <td>80</td>
+                                                            <td>73.8</td>
+                                                            <td><button class="btn btn-sm btn-outline-primary">查看详情</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>李四</td>
+                                                            <td>78</td>
+                                                            <td>82</td>
+                                                            <td>65</td>
+                                                            <td>75</td>
+                                                            <td>75.0</td>
+                                                            <td><button class="btn btn-sm btn-outline-primary">查看详情</button></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>王五</td>
+                                                            <td>92</td>
+                                                            <td>55</td>
+                                                            <td>80</td>
+                                                            <td>88</td>
+                                                            <td>78.8</td>
+                                                            <td><button class="btn btn-sm btn-outline-primary">查看详情</button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 教学资源 -->
+                        <div id="teacher-resources" class="teacher-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>教学资源</h2>
+                                    <p class="text-muted">获取教学材料和资源推荐</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            场景脚本库
+                                        </div>
+                                        <div class="card-body">
+                                            <p>系统内置的10-15个高频口语交际场景脚本</p>
+                                            <ul>
+                                                <li>校园演讲</li>
+                                                <li>家庭沟通</li>
+                                                <li>景点讲解</li>
+                                                <li>小组讨论</li>
+                                                <li>职场沟通</li>
+                                                <li>辩论攻防</li>
+                                            </ul>
+                                            <button class="btn btn-primary">查看全部</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            测评标准说明
+                                        </div>
+                                        <div class="card-body">
+                                            <p>四维测评体系详细说明</p>
+                                            <ul>
+                                                <li>语言流畅度评分标准</li>
+                                                <li>逻辑清晰度评分标准</li>
+                                                <li>情感表达评分标准</li>
+                                                <li>用词准确性评分标准</li>
+                                            </ul>
+                                            <button class="btn btn-primary">查看详情</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            教学案例
+                                        </div>
+                                        <div class="card-body">
+                                            <p>优秀教学实践案例分享</p>
+                                            <ul>
+                                                <li>如何利用系统开展口语分层教学</li>
+                                                <li>口语测评数据驱动的教学设计</li>
+                                                <li>口语交际能力提升策略</li>
+                                            </ul>
+                                            <button class="btn btn-primary">查看案例</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            自定义场景
+                                        </div>
+                                        <div class="card-body">
+                                            <p>创建符合本地特色的口语交际场景</p>
+                                            <p class="text-muted">例如：添加"壮族三月三讲解"等本地文化相关场景</p>
+                                            <button class="btn btn-primary">创建场景</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员端主页面 -->
+    <div id="admin-dashboard" class="d-none">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- 侧边栏 -->
+                <div class="col-md-2 sidebar p-0">
+                    <div class="p-3 text-center border-bottom">
+                        <h5>口语智能帮</h5>
+                        <small>管理端</small>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showAdminSection('overview')">
+                                <i class="fas fa-tachometer-alt"></i> 系统概览
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showAdminSection('users')">
+                                <i class="fas fa-users"></i> 用户管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showAdminSection('scenes')">
+                                <i class="fas fa-theater-masks"></i> 场景管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showAdminSection('reports')">
+                                <i class="fas fa-chart-line"></i> 数据统计
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showAdminSection('settings')">
+                                <i class="fas fa-cog"></i> 系统设置
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> 退出登录
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- 主内容区 -->
+                <div class="col-md-10">
+                    <!-- 顶部导航 -->
+                    <nav class="navbar navbar-light bg-light">
+                        <div class="container-fluid">
+                            <span class="navbar-brand mb-0 h1">系统管理台</span>
+                            <div class="d-flex">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-circle"></i> 管理员
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">个人资料</a></li>
+                                        <li><a class="dropdown-item" href="#">账号设置</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    
+                    <div class="p-4">
+                        <!-- 系统概览 -->
+                        <div id="admin-overview" class="admin-section">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>系统概览</h2>
+                                    <p class="text-muted">系统运行状态和关键指标</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>总用户数</h5>
+                                        <h3 class="text-primary">1,258</h3>
+                                        <p class="text-muted">较上月 +12%</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>活跃用户</h5>
+                                        <h3 class="text-success">892</h3>
+                                        <p class="text-muted">本周活跃</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>练习总数</h5>
+                                        <h3 class="text-warning">5,742</h3>
+                                        <p class="text-muted">本月完成</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>系统可用性</h5>
+                                        <h3 class="text-info">99.8%</h3>
+                                        <p class="text-muted">过去30天</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            系统使用趋势
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="usage-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            用户分布
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="user-distribution-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 用户管理 -->
+                        <div id="admin-users" class="admin-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>用户管理</h2>
+                                    <p class="text-muted">管理系统用户和权限</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <span>用户列表</span>
+                                            <button class="btn btn-primary btn-sm">添加用户</button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>用户名</th>
+                                                            <th>角色</th>
+                                                            <th>所属学校/单位</th>
+                                                            <th>注册时间</th>
+                                                            <th>最后登录</th>
+                                                            <th>状态</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>zhangsan</td>
+                                                            <td>学生</td>
+                                                            <td>南宁市第一中学</td>
+                                                            <td>2025-09-01</td>
+                                                            <td>2025-10-26</td>
+                                                            <td><span class="badge bg-success">正常</span></td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">编辑</button>
+                                                                <button class="btn btn-sm btn-outline-danger">禁用</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>wanglaoshi</td>
+                                                            <td>教师</td>
+                                                            <td>南宁市第一中学</td>
+                                                            <td>2025-08-15</td>
+                                                            <td>2025-10-27</td>
+                                                            <td><span class="badge bg-success">正常</span></td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">编辑</button>
+                                                                <button class="btn btn-sm btn-outline-danger">禁用</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 场景管理 -->
+                        <div id="admin-scenes" class="admin-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>场景管理</h2>
+                                    <p class="text-muted">管理系统内置的口语交际场景</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <span>场景列表</span>
+                                            <button class="btn btn-primary btn-sm">添加场景</button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>场景名称</th>
+                                                            <th>适用学段</th>
+                                                            <th>使用次数</th>
+                                                            <th>平均评分</th>
+                                                            <th>状态</th>
+                                                            <th>操作</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>校园演讲</td>
+                                                            <td>初中,高中</td>
+                                                            <td>1,258</td>
+                                                            <td>4.5</td>
+                                                            <td><span class="badge bg-success">启用</span></td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">编辑</button>
+                                                                <button class="btn btn-sm btn-outline-warning">停用</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>家庭沟通</td>
+                                                            <td>小学,初中</td>
+                                                            <td>892</td>
+                                                            <td>4.3</td>
+                                                            <td><span class="badge bg-success">启用</span></td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">编辑</button>
+                                                                <button class="btn btn-sm btn-outline-warning">停用</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>景点讲解</td>
+                                                            <td>初中,高中,职业教育</td>
+                                                            <td>756</td>
+                                                            <td>4.6</td>
+                                                            <td><span class="badge bg-success">启用</span></td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-primary">编辑</button>
+                                                                <button class="btn btn-sm btn-outline-warning">停用</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 数据统计 -->
+                        <div id="admin-reports" class="admin-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>数据统计</h2>
+                                    <p class="text-muted">系统使用数据统计和分析</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            场景使用排行
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="scene-ranking-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            地域分布
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="region-distribution-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            系统性能指标
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 text-center">
+                                                    <h4 class="text-primary">98.5%</h4>
+                                                    <p class="text-muted">语音识别准确率</p>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <h4 class="text-success">92%</h4>
+                                                    <p class="text-muted">测评与人工评分一致性</p>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <h4 class="text-warning">1.2秒</h4>
+                                                    <p class="text-muted">平均响应时间</p>
+                                                </div>
+                                                <div class="col-md-3 text-center">
+                                                    <h4 class="text-info">99.8%</h4>
+                                                    <p class="text-muted">系统可用性</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 系统设置 -->
+                        <div id="admin-settings" class="admin-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>系统设置</h2>
+                                    <p class="text-muted">配置系统参数和功能</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            基本设置
+                                        </div>
+                                        <div class="card-body">
+                                            <form>
+                                                <div class="mb-3">
+                                                    <label class="form-label">系统名称</label>
+                                                    <input type="text" class="form-control" value="语文口语交际情境模拟与智能测评系统">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">平台对接</label>
+                                                    <select class="form-select">
+                                                        <option selected>广西智慧教育平台</option>
+                                                        <option>国家中小学网络云平台</option>
+                                                        <option>其他平台</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">语音识别接口</label>
+                                                    <select class="form-select">
+                                                        <option selected>科大讯飞语音API</option>
+                                                        <option>百度语音API</option>
+                                                        <option>阿里云语音API</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3 form-check">
+                                                    <input type="checkbox" class="form-check-input" id="enable-dialect" checked>
+                                                    <label class="form-check-label" for="enable-dialect">启用方言识别（粤语、壮语）</label>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">保存设置</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            测评参数设置
+                                        </div>
+                                        <div class="card-body">
+                                            <form>
+                                                <div class="mb-3">
+                                                    <label class="form-label">测评维度权重</label>
+                                                    <div class="mb-2">
+                                                        <label class="form-label">语言流畅度</label>
+                                                        <input type="range" class="form-range" min="0" max="100" value="25">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label">逻辑清晰度</label>
+                                                        <input type="range" class="form-range" min="0" max="100" value="30">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label">情感表达</label>
+                                                        <input type="range" class="form-range" min="0" max="100" value="20">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label">用词准确性</label>
+                                                        <input type="range" class="form-range" min="0" max="100" value="25">
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">测评标准</label>
+                                                    <select class="form-select">
+                                                        <option selected>语文课程标准(2022版)</option>
+                                                        <option>语文课程标准(2017版)</option>
+                                                        <option>自定义标准</option>
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">保存设置</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="d-none" id="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>口语智能帮</h5>
+                    <p>语文口语交际情境模拟与智能测评系统</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>适配广西智慧教育平台</p>
+                    <p>© 2025 口语智能帮团队 版权所有</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & Font Awesome -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 模拟数据
+        const studentData = [
+            { name: '张三', fluency: 85, logic: 60, emotion: 70, accuracy: 80 },
+            { name: '李四', fluency: 78, logic: 82, emotion: 65, accuracy: 75 },
+            { name: '王五', fluency: 92, logic: 55, emotion: 80, accuracy: 88 },
+            { name: '赵六', fluency: 70, logic: 75, emotion: 60, accuracy: 72 },
+            { name: '钱七', fluency: 88, logic: 68, emotion: 75, accuracy: 82 }
+        ];
+        
+        // 场景对话示例
+        const sceneDialogues = {
+            '校园演讲': [
+                { speaker: 'ai', text: '同学你好，请开始你的演讲开场。' },
+                { speaker: 'ai', text: '你的开场很亲切，接下来可以说说你的梦想是什么吗？' },
+                { speaker: 'ai', text: '很好，那么为了实现这个梦想，你目前做了哪些努力？' }
+            ],
+            '家庭沟通': [
+                { speaker: 'ai', text: '孩子，最近学习怎么样？有什么困难吗？' },
+                { speaker: 'ai', text: '我理解你的压力，但要注意劳逸结合。周末有什么计划吗？' },
+                { speaker: 'ai', text: '这个计划不错，不过也要记得完成作业哦。' }
+            ],
+            '景点讲解': [
+                { speaker: 'ai', text: '欢迎各位游客来到桂林，请开始你的景点介绍。' },
+                { speaker: 'ai', text: '介绍得很好，能详细说说桂林山水的特点吗？' },
+                { speaker: 'ai', text: '谢谢你的精彩讲解，游客们对桂林的历史文化也很感兴趣，可以补充一下吗？' }
+            ]
+        };
+        
+        // 当前用户角色
+        let currentRole = 'student';
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化角色选择
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    currentRole = this.getAttribute('data-role');
+                });
+            });
+            
+            // 初始化学生端图表
+            initStudentCharts();
+            
+            // 初始化教师端图表
+            initTeacherCharts();
+            
+            // 初始化管理员端图表
+            initAdminCharts();
+        });
+        
+        // 登录功能
+        function login() {
+            document.getElementById('login-page').classList.add('d-none');
+            document.getElementById('main-footer').classList.remove('d-none');
+            
+            if (currentRole === 'student') {
+                document.getElementById('student-dashboard').classList.remove('d-none');
+                showStudentSection('home');
+            } else if (currentRole === 'teacher') {
+                document.getElementById('teacher-dashboard').classList.remove('d-none');
+                showTeacherSection('overview');
+            } else if (currentRole === 'admin') {
+                document.getElementById('admin-dashboard').classList.remove('d-none');
+                showAdminSection('overview');
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            document.getElementById('login-page').classList.remove('d-none');
+            document.getElementById('student-dashboard').classList.add('d-none');
+            document.getElementById('teacher-dashboard').classList.add('d-none');
+            document.getElementById('admin-dashboard').classList.add('d-none');
+            document.getElementById('main-footer').classList.add('d-none');
+        }
+        
+        // 学生端页面切换
+        function showStudentSection(section) {
+            document.querySelectorAll('.student-section').forEach(sec => {
+                sec.classList.add('d-none');
+            });
+            document.getElementById('student-' + section).classList.remove('d-none');
+            
+            // 更新导航激活状态
+            document.querySelectorAll('#student-dashboard .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // 教师端页面切换
+        function showTeacherSection(section) {
+            document.querySelectorAll('.teacher-section').forEach(sec => {
+                sec.classList.add('d-none');
+            });
+            document.getElementById('teacher-' + section).classList.remove('d-none');
+            
+            // 更新导航激活状态
+            document.querySelectorAll('#teacher-dashboard .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // 管理员端页面切换
+        function showAdminSection(section) {
+            document.querySelectorAll('.admin-section').forEach(sec => {
+                sec.classList.add('d-none');
+            });
+            document.getElementById('admin-' + section).classList.remove('d-none');
+            
+            // 更新导航激活状态
+            document.querySelectorAll('#admin-dashboard .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        // 选择场景
+        function selectScene(sceneName) {
+            document.getElementById('current-scene').textContent = sceneName;
+            document.getElementById('scene-interaction').style.display = 'block';
+            
+            // 清空对话容器
+            const container = document.getElementById('dialogue-container');
+            container.innerHTML = '';
+            
+            // 添加初始AI对话
+            const initialDialogue = sceneDialogues[sceneName][0];
+            addDialogueBubble(initialDialogue.speaker, initialDialogue.text);
+        }
+        
+        // 结束场景练习并显示测评报告
+        function endScene() {
+            document.getElementById('scene-interaction').style.display = 'none';
+            showStudentSection('reports');
+            showReport('report1');
+        }
+        
+        // 添加对话气泡
+        function addDialogueBubble(speaker, text) {
+            const container = document.getElementById('dialogue-container');
+            const bubble = document.createElement('div');
+            bubble.className = `speech-bubble ${speaker}`;
+            bubble.innerHTML = `<strong>${speaker === 'ai' ? 'AI智能体' : '我'}:</strong> ${text}`;
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // 切换录音状态
+        function toggleRecording() {
+            const btn = document.getElementById('record-btn');
+            const status = document.getElementById('recording-status');
+            
+            if (btn.innerHTML.includes('开始录音')) {
+                btn.innerHTML = '<i class="fas fa-stop"></i> 停止录音';
+                btn.classList.remove('btn-outline-primary');
+                btn.classList.add('btn-danger');
+                status.textContent = '录音中... 请开始说话';
+                // 实际应用中这里会调用Web Speech API
+            } else {
+                btn.innerHTML = '<i class="fas fa-microphone"></i> 开始录音';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-primary');
+                status.textContent = '录音已结束，分析中...';
+                
+                // 模拟语音识别结果
+                setTimeout(() => {
+                    const recognizedText = "我认为保护环境非常重要，我们应该从身边的小事做起。";
+                    document.getElementById('text-input').value = recognizedText;
+                    status.textContent = '语音识别完成';
+                }, 1500);
+            }
+        }
+        
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('text-input');
+            const text = input.value.trim();
+            
+            if (text) {
+                // 添加用户消息
+                addDialogueBubble('student', text);
+                input.value = '';
+                
+                // 模拟AI响应
+                setTimeout(() => {
+                    const sceneName = document.getElementById('current-scene').textContent;
+                    const dialogues = sceneDialogues[sceneName];
+                    const nextDialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+                    addDialogueBubble(nextDialogue.speaker, nextDialogue.text);
+                }, 1000);
+            }
+        }
+        
+        // 显示测评报告
+        function showReport(reportId) {
+            const container = document.getElementById('report-details');
+            
+            if (reportId === 'report1') {
+                container.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="radar-chart" class="radar-chart"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>四维测评结果</h5>
+                            <div class="mb-3">
+                                <label>语言流畅度</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 85%">85分</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>逻辑清晰度</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 60%">60分</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>情感表达</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 70%">70分</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>用词准确性</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 80%">80分</div>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mt-4">改进建议</h5>
+                            <ul>
+                                <li>逻辑清晰度有待提升，建议练习"逻辑框架梳理"</li>
+                                <li>情感表达可以更丰富，尝试加入更多情感词汇</li>
+                                <li>注意演讲中的停顿和节奏变化</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                // 重新初始化雷达图
+                initRadarChart();
+            }
+        }
+        
+        // 初始化学生端图表
+        function initStudentCharts() {
+            initRadarChart();
+            initHeatmap();
+        }
+        
+        // 初始化教师端图表
+        function initTeacherCharts() {
+            initTrendChart();
+            initDimensionChart();
+            initTeacherHeatmap();
+        }
+        
+        // 初始化管理员端图表
+        function initAdminCharts() {
+            initUsageChart();
+            initUserDistributionChart();
+            initSceneRankingChart();
+            initRegionDistributionChart();
+        }
+        
+        // 初始化雷达图
+        function initRadarChart() {
+            const chartDom = document.getElementById('radar-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                radar: {
+                    indicator: [
+                        { name: '语言流畅度', max: 100 },
+                        { name: '逻辑清晰度', max: 100 },
+                        { name: '情感表达', max: 100 },
+                        { name: '用词准确性', max: 100 }
+                    ]
+                },
+                series: [{
+                    type: 'radar',
+                    data: [
+                        {
+                            value: [85, 60, 70, 80],
+                            name: '当前表现',
+                            areaStyle: {
+                                color: 'rgba(52, 152, 219, 0.6)'
+                            },
+                            lineStyle: {
+                                color: 'rgb(52, 152, 219)'
+                            }
+                        },
+                        {
+                            value: [90, 85, 80, 90],
+                            name: '班级平均',
+                            areaStyle: {
+                                color: 'rgba(46, 204, 113, 0.2)'
+                            },
+                            lineStyle: {
+                                color: 'rgb(46, 204, 113)'
+                            }
+                        }
+                    ]
+                }]
+            };
+            
+            myChart.setOption(option);
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化热力图
+        function initHeatmap() {
+            const container = document.getElementById('heatmap-container');
+            if (!container) return;
+            
+            // 创建表头
+            let html = '<div class="d-flex mb-2">';
+            html += '<div style="width: 100px;"></div>'; // 学生姓名列
+            html += '<div class="d-flex flex-grow-1 justify-content-around">';
+            html += '<div class="text-center" style="width: 25%;">语言流畅度</div>';
+            html += '<div class="text-center" style="width: 25%;">逻辑清晰度</div>';
+            html += '<div class="text-center" style="width: 25%;">情感表达</div>';
+            html += '<div class="text-center" style="width: 25%;">用词准确性</div>';
+            html += '</div></div>';
+            
+            // 创建学生数据行
+            studentData.forEach(student => {
+                html += '<div class="d-flex mb-1">';
+                html += `<div style="width: 100px; line-height: 20px;">${student.name}</div>`;
+                html += '<div class="d-flex flex-grow-1 justify-content-around">';
+                
+                // 为每个维度添加热力图单元格
+                [student.fluency, student.logic, student.emotion, student.accuracy].forEach(score => {
+                    let color;
+                    if (score < 60) {
+                        color = '#d73027'; // 红色 - 需加强
+                    } else if (score < 80) {
+                        color = '#fee08b'; // 黄色 - 一般
+                    } else {
+                        color = '#1a9850'; // 绿色 - 良好
+                    }
+                    
+                    html += `<div class="heatmap-cell" style="background-color: ${color};" title="${score}分"></div>`;
+                });
+                
+                html += '</div></div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 初始化教师端热力图
+        function initTeacherHeatmap() {
+            const container = document.getElementById('heatmap-container');
+            if (!container) return;
+            
+            initHeatmap(); // 复用学生端的热力图代码
+        }
+        
+        // 初始化趋势图
+        function initTrendChart() {
+            const chartDom = document.getElementById('trend-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['语言流畅度', '逻辑清晰度', '情感表达', '用词准确性', '综合得分']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['9月', '10月', '11月', '12月', '1月', '2月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '语言流畅度',
+                        type: 'line',
+                        data: [65, 70, 75, 78, 80, 82],
+                        smooth: true
+                    },
+                    {
+                        name: '逻辑清晰度',
+                        type: 'line',
+                        data: [55, 58, 60, 62, 65, 68],
+                        smooth: true
+                    },
+                    {
+                        name: '情感表达',
+                        type: 'line',
+                        data: [60, 65, 68, 70, 72, 73],
+                        smooth: true
+                    },
+                    {
+                        name: '用词准确性',
+                        type: 'line',
+                        data: [70, 72, 75, 76, 78, 80],
+                        smooth: true
+                    },
+                    {
+                        name: '综合得分',
+                        type: 'line',
+                        data: [62.5, 66.25, 69.5, 71.5, 73.75, 75.75],
+                        smooth: true,
+                        lineStyle: {
+                            width: 3
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化维度分布图
+        function initDimensionChart() {
+            const chartDom = document.getElementById('dimension-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '学生分布',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: 8, name: '优秀 (80-100分)' },
+                            { value: 20, name: '良好 (60-80分)' },
+                            { value: 12, name: '需加强 (0-60分)' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化使用趋势图
+        function initUsageChart() {
+            const chartDom = document.getElementById('usage-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['活跃用户', '练习次数', '新注册用户']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['6月', '7月', '8月', '9月', '10月', '11月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '活跃用户',
+                        type: 'line',
+                        data: [320, 432, 501, 634, 790, 892],
+                        smooth: true
+                    },
+                    {
+                        name: '练习次数',
+                        type: 'line',
+                        data: [1200, 1820, 1910, 2340, 2900, 3320],
+                        smooth: true
+                    },
+                    {
+                        name: '新注册用户',
+                        type: 'line',
+                        data: [150, 232, 301, 434, 590, 630],
+                        smooth: true
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化用户分布图
+        function initUserDistributionChart() {
+            const chartDom = document.getElementById('user-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '用户类型',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: 892, name: '学生' },
+                            { value: 245, name: '教师' },
+                            { value: 121, name: '管理员' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化场景排行图
+        function initSceneRankingChart() {
+            const chartDom = document.getElementById('scene-ranking-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['求职面试', '小组讨论', '景点讲解', '家庭沟通', '校园演讲']
+                },
+                series: [
+                    {
+                        name: '使用次数',
+                        type: 'bar',
+                        data: [520, 632, 701, 834, 1258],
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae'];
+                                return colorList[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化地域分布图
+        function initRegionDistributionChart() {
+            const chartDom = document.getElementById('region-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                series: [
+                    {
+                        name: '用户分布',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 435, name: '南宁市' },
+                            { value: 310, name: '柳州市' },
+                            { value: 234, name: '桂林市' },
+                            { value: 135, name: '梧州市' },
+                            { value: 144, name: '其他地区' }
+                        ]
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+    </script>
+</body>
+</html>
