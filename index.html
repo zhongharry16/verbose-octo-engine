@@ -91,7 +91,8 @@
             margin-right: 20%;
         }
         
-        .radar-chart {
+        .radar-chart, .trend-chart, .dimension-chart, .usage-chart, 
+        .user-distribution-chart, .scene-ranking-chart, .region-distribution-chart {
             height: 400px;
             width: 100%;
         }
@@ -220,8 +221,13 @@
             justify-content: center;
         }
         
+        .chart-container {
+            padding: 15px;
+        }
+        
         @media (max-width: 768px) {
-            .radar-chart {
+            .radar-chart, .trend-chart, .dimension-chart, .usage-chart, 
+            .user-distribution-chart, .scene-ranking-chart, .region-distribution-chart {
                 height: 300px;
             }
             
@@ -313,6 +319,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showStudentSection('resources')">练习资源</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showStudentSection('statistics')">学习统计</a>
                         </li>
                     </ul>
                     <div class="navbar-nav">
@@ -763,6 +772,93 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 学习统计 -->
+            <div id="student-statistics" class="student-section d-none">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h2>学习统计</h2>
+                        <p class="text-muted">查看学习进度和数据分析</p>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card dashboard-card text-center p-3">
+                            <h5>总练习次数</h5>
+                            <h3 class="text-primary">42</h3>
+                            <p class="text-muted">较上月 +8次</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-card text-center p-3">
+                            <h5>平均练习时长</h5>
+                            <h3 class="text-success">12.5分钟</h3>
+                            <p class="text-muted">每次练习</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-card text-center p-3">
+                            <h5>最常练习场景</h5>
+                            <h3 class="text-warning">校园演讲</h3>
+                            <p class="text-muted">占总练习38%</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-card text-center p-3">
+                            <h5>进步幅度</h5>
+                            <h3 class="text-info">+8.2分</h3>
+                            <p class="text-muted">较上月</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                口语能力成长趋势
+                            </div>
+                            <div class="card-body">
+                                <div id="student-trend-chart" class="trend-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                场景练习分布
+                            </div>
+                            <div class="card-body">
+                                <div id="student-scene-distribution-chart" class="dimension-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                练习时间分布
+                            </div>
+                            <div class="card-body">
+                                <div id="student-time-distribution-chart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                能力提升对比
+                            </div>
+                            <div class="card-body">
+                                <div id="student-improvement-chart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -795,6 +891,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="showTeacherSection('reports')">
                                 <i class="fas fa-chart-bar"></i> 学情报告
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showTeacherSection('statistics')">
+                                <i class="fas fa-chart-line"></i> 统计分析
                             </a>
                         </li>
                         <li class="nav-item">
@@ -889,7 +990,7 @@
                                             班级口语能力趋势
                                         </div>
                                         <div class="card-body">
-                                            <div id="trend-chart" style="height: 300px;"></div>
+                                            <div id="teacher-trend-chart" class="trend-chart"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -899,7 +1000,7 @@
                                             能力维度分布
                                         </div>
                                         <div class="card-body">
-                                            <div id="dimension-chart" style="height: 300px;"></div>
+                                            <div id="teacher-dimension-chart" class="dimension-chart"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -912,7 +1013,7 @@
                                             班级口语能力热力图
                                         </div>
                                         <div class="card-body">
-                                            <div id="heatmap-container">
+                                            <div id="teacher-heatmap-container">
                                                 <!-- 热力图内容将动态生成 -->
                                             </div>
                                             <div class="heatmap-legend">
@@ -1155,6 +1256,122 @@
                             </div>
                         </div>
                         
+                        <!-- 统计分析 -->
+                        <div id="teacher-statistics" class="teacher-section d-none">
+                            <div class="row mb-4">
+                                <div class="col">
+                                    <h2>教学统计分析</h2>
+                                    <p class="text-muted">班级整体学习数据与趋势分析</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>班级平均分</h5>
+                                        <h3 class="text-primary">73.5</h3>
+                                        <p class="text-muted">较上月 +5.2分</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>练习完成率</h5>
+                                        <h3 class="text-success">87%</h3>
+                                        <p class="text-muted">35/40名学生</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>薄弱维度</h5>
+                                        <h3 class="text-warning">逻辑清晰度</h3>
+                                        <p class="text-muted">65%学生未达标</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>最常练习场景</h5>
+                                        <h3 class="text-info">校园演讲</h3>
+                                        <p class="text-muted">占总练习42%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            班级口语能力趋势
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="teacher-trend-chart2" class="trend-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            能力维度分布
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="teacher-dimension-chart2" class="dimension-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            场景使用排行
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="teacher-scene-ranking-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            学生能力分布
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="teacher-student-distribution-chart" style="height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            班级口语能力热力图
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="teacher-heatmap-container2">
+                                                <!-- 热力图内容将动态生成 -->
+                                            </div>
+                                            <div class="heatmap-legend">
+                                                <div class="heatmap-legend-item">
+                                                    <div class="heatmap-legend-color" style="background-color: #d73027;"></div>
+                                                    <span>需加强 (0-60分)</span>
+                                                </div>
+                                                <div class="heatmap-legend-item">
+                                                    <div class="heatmap-legend-color" style="background-color: #fee08b;"></div>
+                                                    <span>一般 (60-80分)</span>
+                                                </div>
+                                                <div class="heatmap-legend-item">
+                                                    <div class="heatmap-legend-color" style="background-color: #1a9850;"></div>
+                                                    <span>良好 (80-100分)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- 教学资源 -->
                         <div id="teacher-resources" class="teacher-section d-none">
                             <div class="row mb-4">
@@ -1352,7 +1569,7 @@
                                             系统使用趋势
                                         </div>
                                         <div class="card-body">
-                                            <div id="usage-chart" style="height: 300px;"></div>
+                                            <div id="admin-usage-chart" class="usage-chart"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1362,7 +1579,7 @@
                                             用户分布
                                         </div>
                                         <div class="card-body">
-                                            <div id="user-distribution-chart" style="height: 300px;"></div>
+                                            <div id="admin-user-distribution-chart" class="user-distribution-chart"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1514,29 +1731,85 @@
                                 </div>
                             </div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>总用户数</h5>
+                                        <h3 class="text-primary">1,258</h3>
+                                        <p class="text-muted">较上月 +12%</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>活跃用户</h5>
+                                        <h3 class="text-success">892</h3>
+                                        <p class="text-muted">本周活跃</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>练习总数</h5>
+                                        <h3 class="text-warning">5,742</h3>
+                                        <p class="text-muted">本月完成</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card dashboard-card text-center p-3">
+                                        <h5>系统可用性</h5>
+                                        <h3 class="text-info">99.8%</h3>
+                                        <p class="text-muted">过去30天</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            系统使用趋势
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="admin-usage-chart2" class="usage-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            用户分布
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="admin-user-distribution-chart2" class="user-distribution-chart"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
                                     <div class="card">
                                         <div class="card-header">
                                             场景使用排行
                                         </div>
                                         <div class="card-body">
-                                            <div id="scene-ranking-chart" style="height: 300px;"></div>
+                                            <div id="admin-scene-ranking-chart" class="scene-ranking-chart"></div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-6">
                                     <div class="card">
                                         <div class="card-header">
                                             地域分布
                                         </div>
                                         <div class="card-body">
-                                            <div id="region-distribution-chart" style="height: 300px;"></div>
+                                            <div id="admin-region-distribution-chart" class="region-distribution-chart"></div>
                                         </div>
                                     </div>
                                 </div>
-                                
+                            </div>
+                            
+                            <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-header">
@@ -1723,13 +1996,9 @@
                 });
             });
             
-            // 初始化学生端图表
+            // 初始化图表
             initStudentCharts();
-            
-            // 初始化教师端图表
             initTeacherCharts();
-            
-            // 初始化管理员端图表
             initAdminCharts();
         });
         
@@ -1771,6 +2040,13 @@
                 link.classList.remove('active');
             });
             event.target.classList.add('active');
+            
+            // 如果是统计页面，重新渲染图表
+            if (section === 'statistics') {
+                setTimeout(() => {
+                    initStudentCharts();
+                }, 100);
+            }
         }
         
         // 教师端页面切换
@@ -1785,6 +2061,13 @@
                 link.classList.remove('active');
             });
             event.target.classList.add('active');
+            
+            // 如果是统计页面，重新渲染图表
+            if (section === 'statistics') {
+                setTimeout(() => {
+                    initTeacherCharts();
+                }, 100);
+            }
         }
         
         // 管理员端页面切换
@@ -1932,23 +2215,726 @@
         
         // 初始化学生端图表
         function initStudentCharts() {
-            initRadarChart();
-            initHeatmap();
+            initStudentTrendChart();
+            initStudentSceneDistributionChart();
+            initStudentTimeDistributionChart();
+            initStudentImprovementChart();
         }
         
         // 初始化教师端图表
         function initTeacherCharts() {
-            initTrendChart();
-            initDimensionChart();
+            initTeacherTrendChart();
+            initTeacherDimensionChart();
+            initTeacherSceneRankingChart();
+            initTeacherStudentDistributionChart();
             initTeacherHeatmap();
         }
         
         // 初始化管理员端图表
         function initAdminCharts() {
-            initUsageChart();
-            initUserDistributionChart();
-            initSceneRankingChart();
-            initRegionDistributionChart();
+            initAdminUsageChart();
+            initAdminUserDistributionChart();
+            initAdminSceneRankingChart();
+            initAdminRegionDistributionChart();
+        }
+        
+        // 初始化学生趋势图
+        function initStudentTrendChart() {
+            const chartDom = document.getElementById('student-trend-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['语言流畅度', '逻辑清晰度', '情感表达', '用词准确性', '综合得分']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['9月', '10月', '11月', '12月', '1月', '2月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '语言流畅度',
+                        type: 'line',
+                        data: [65, 70, 75, 78, 80, 82],
+                        smooth: true,
+                        lineStyle: {
+                            color: '#2ecc71'
+                        }
+                    },
+                    {
+                        name: '逻辑清晰度',
+                        type: 'line',
+                        data: [55, 58, 60, 62, 65, 68],
+                        smooth: true,
+                        lineStyle: {
+                            color: '#3498db'
+                        }
+                    },
+                    {
+                        name: '情感表达',
+                        type: 'line',
+                        data: [60, 65, 68, 70, 72, 73],
+                        smooth: true,
+                        lineStyle: {
+                            color: '#e74c3c'
+                        }
+                    },
+                    {
+                        name: '用词准确性',
+                        type: 'line',
+                        data: [70, 72, 75, 76, 78, 80],
+                        smooth: true,
+                        lineStyle: {
+                            color: '#f39c12'
+                        }
+                    },
+                    {
+                        name: '综合得分',
+                        type: 'line',
+                        data: [62.5, 66.25, 69.5, 71.5, 73.75, 75.75],
+                        smooth: true,
+                        lineStyle: {
+                            width: 3,
+                            color: '#9b59b6'
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化学生场景分布图
+        function initStudentSceneDistributionChart() {
+            const chartDom = document.getElementById('student-scene-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '练习场景',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: 16, name: '校园演讲' },
+                            { value: 12, name: '家庭沟通' },
+                            { value: 8, name: '景点讲解' },
+                            { value: 6, name: '小组讨论' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化学生时间分布图
+        function initStudentTimeDistributionChart() {
+            const chartDom = document.getElementById('student-time-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '练习时长(分钟)',
+                        type: 'bar',
+                        data: [15, 20, 36, 10, 25, 40, 30],
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae', '#749f83', '#ca8622'];
+                                return colorList[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化学生能力提升图
+        function initStudentImprovementChart() {
+            const chartDom = document.getElementById('student-improvement-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['上月', '本月']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['用词准确性', '情感表达', '逻辑清晰度', '语言流畅度']
+                },
+                series: [
+                    {
+                        name: '上月',
+                        type: 'bar',
+                        data: [72, 65, 57, 74],
+                        itemStyle: {
+                            color: '#95a5a6'
+                        }
+                    },
+                    {
+                        name: '本月',
+                        type: 'bar',
+                        data: [80, 73, 65, 82],
+                        itemStyle: {
+                            color: '#3498db'
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化教师趋势图
+        function initTeacherTrendChart() {
+            const chartDom = document.getElementById('teacher-trend-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['语言流畅度', '逻辑清晰度', '情感表达', '用词准确性', '班级平均分']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['9月', '10月', '11月', '12月', '1月', '2月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '语言流畅度',
+                        type: 'line',
+                        data: [65, 70, 75, 78, 80, 82],
+                        smooth: true
+                    },
+                    {
+                        name: '逻辑清晰度',
+                        type: 'line',
+                        data: [55, 58, 60, 62, 65, 68],
+                        smooth: true
+                    },
+                    {
+                        name: '情感表达',
+                        type: 'line',
+                        data: [60, 65, 68, 70, 72, 73],
+                        smooth: true
+                    },
+                    {
+                        name: '用词准确性',
+                        type: 'line',
+                        data: [70, 72, 75, 76, 78, 80],
+                        smooth: true
+                    },
+                    {
+                        name: '班级平均分',
+                        type: 'line',
+                        data: [62.5, 66.25, 69.5, 71.5, 73.75, 75.75],
+                        smooth: true,
+                        lineStyle: {
+                            width: 3
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化教师维度分布图
+        function initTeacherDimensionChart() {
+            const chartDom = document.getElementById('teacher-dimension-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '学生分布',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: 8, name: '优秀 (80-100分)' },
+                            { value: 20, name: '良好 (60-80分)' },
+                            { value: 12, name: '需加强 (0-60分)' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化教师场景排行图
+        function initTeacherSceneRankingChart() {
+            const chartDom = document.getElementById('teacher-scene-ranking-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['求职面试', '小组讨论', '景点讲解', '家庭沟通', '校园演讲']
+                },
+                series: [
+                    {
+                        name: '使用次数',
+                        type: 'bar',
+                        data: [520, 632, 701, 834, 1258],
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae'];
+                                return colorList[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化教师学生分布图
+        function initTeacherStudentDistributionChart() {
+            const chartDom = document.getElementById('teacher-student-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '学生能力分布',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 8, name: '优秀' },
+                            { value: 20, name: '良好' },
+                            { value: 12, name: '需加强' }
+                        ]
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化教师热力图
+        function initTeacherHeatmap() {
+            const container = document.getElementById('teacher-heatmap-container');
+            if (!container) return;
+            
+            // 创建表头
+            let html = '<div class="d-flex mb-2">';
+            html += '<div style="width: 100px;"></div>'; // 学生姓名列
+            html += '<div class="d-flex flex-grow-1 justify-content-around">';
+            html += '<div class="text-center" style="width: 25%;">语言流畅度</div>';
+            html += '<div class="text-center" style="width: 25%;">逻辑清晰度</div>';
+            html += '<div class="text-center" style="width: 25%;">情感表达</div>';
+            html += '<div class="text-center" style="width: 25%;">用词准确性</div>';
+            html += '</div></div>';
+            
+            // 创建学生数据行
+            studentData.forEach(student => {
+                html += '<div class="d-flex mb-1">';
+                html += `<div style="width: 100px; line-height: 20px;">${student.name}</div>`;
+                html += '<div class="d-flex flex-grow-1 justify-content-around">';
+                
+                // 为每个维度添加热力图单元格
+                [student.fluency, student.logic, student.emotion, student.accuracy].forEach(score => {
+                    let color;
+                    if (score < 60) {
+                        color = '#d73027'; // 红色 - 需加强
+                    } else if (score < 80) {
+                        color = '#fee08b'; // 黄色 - 一般
+                    } else {
+                        color = '#1a9850'; // 绿色 - 良好
+                    }
+                    
+                    html += `<div class="heatmap-cell" style="background-color: ${color};" title="${score}分"></div>`;
+                });
+                
+                html += '</div></div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 初始化管理员使用趋势图
+        function initAdminUsageChart() {
+            const chartDom = document.getElementById('admin-usage-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['活跃用户', '练习次数', '新注册用户']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['6月', '7月', '8月', '9月', '10月', '11月']
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: '活跃用户',
+                        type: 'line',
+                        data: [320, 432, 501, 634, 790, 892],
+                        smooth: true
+                    },
+                    {
+                        name: '练习次数',
+                        type: 'line',
+                        data: [1200, 1820, 1910, 2340, 2900, 3320],
+                        smooth: true
+                    },
+                    {
+                        name: '新注册用户',
+                        type: 'line',
+                        data: [150, 232, 301, 434, 590, 630],
+                        smooth: true
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化管理员用户分布图
+        function initAdminUserDistributionChart() {
+            const chartDom = document.getElementById('admin-user-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left'
+                },
+                series: [
+                    {
+                        name: '用户类型',
+                        type: 'pie',
+                        radius: '50%',
+                        data: [
+                            { value: 892, name: '学生' },
+                            { value: 245, name: '教师' },
+                            { value: 121, name: '管理员' }
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化管理员场景排行图
+        function initAdminSceneRankingChart() {
+            const chartDom = document.getElementById('admin-scene-ranking-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: ['求职面试', '小组讨论', '景点讲解', '家庭沟通', '校园演讲']
+                },
+                series: [
+                    {
+                        name: '使用次数',
+                        type: 'bar',
+                        data: [520, 632, 701, 834, 1258],
+                        itemStyle: {
+                            color: function(params) {
+                                const colorList = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae'];
+                                return colorList[params.dataIndex];
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化管理员地域分布图
+        function initAdminRegionDistributionChart() {
+            const chartDom = document.getElementById('admin-region-distribution-chart');
+            if (!chartDom) return;
+            
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item'
+                },
+                series: [
+                    {
+                        name: '用户分布',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '18',
+                                fontWeight: 'bold'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 435, name: '南宁市' },
+                            { value: 310, name: '柳州市' },
+                            { value: 234, name: '桂林市' },
+                            { value: 135, name: '梧州市' },
+                            { value: 144, name: '其他地区' }
+                        ]
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
         }
         
         // 初始化雷达图
@@ -2005,371 +2991,40 @@
             });
         }
         
-        // 初始化热力图
-        function initHeatmap() {
-            const container = document.getElementById('heatmap-container');
+        // 为统计分析页面添加额外的图表初始化
+        function initTeacherTrendChart2() {
+            const chartDom = document.getElementById('teacher-trend-chart2');
+            if (!chartDom) return;
+            
+            initTeacherTrendChart(); // 复用相同的图表
+        }
+        
+        function initTeacherDimensionChart2() {
+            const chartDom = document.getElementById('teacher-dimension-chart2');
+            if (!chartDom) return;
+            
+            initTeacherDimensionChart(); // 复用相同的图表
+        }
+        
+        function initTeacherHeatmap2() {
+            const container = document.getElementById('teacher-heatmap-container2');
             if (!container) return;
             
-            // 创建表头
-            let html = '<div class="d-flex mb-2">';
-            html += '<div style="width: 100px;"></div>'; // 学生姓名列
-            html += '<div class="d-flex flex-grow-1 justify-content-around">';
-            html += '<div class="text-center" style="width: 25%;">语言流畅度</div>';
-            html += '<div class="text-center" style="width: 25%;">逻辑清晰度</div>';
-            html += '<div class="text-center" style="width: 25%;">情感表达</div>';
-            html += '<div class="text-center" style="width: 25%;">用词准确性</div>';
-            html += '</div></div>';
-            
-            // 创建学生数据行
-            studentData.forEach(student => {
-                html += '<div class="d-flex mb-1">';
-                html += `<div style="width: 100px; line-height: 20px;">${student.name}</div>`;
-                html += '<div class="d-flex flex-grow-1 justify-content-around">';
-                
-                // 为每个维度添加热力图单元格
-                [student.fluency, student.logic, student.emotion, student.accuracy].forEach(score => {
-                    let color;
-                    if (score < 60) {
-                        color = '#d73027'; // 红色 - 需加强
-                    } else if (score < 80) {
-                        color = '#fee08b'; // 黄色 - 一般
-                    } else {
-                        color = '#1a9850'; // 绿色 - 良好
-                    }
-                    
-                    html += `<div class="heatmap-cell" style="background-color: ${color};" title="${score}分"></div>`;
-                });
-                
-                html += '</div></div>';
-            });
-            
-            container.innerHTML = html;
+            initTeacherHeatmap(); // 复用相同的热力图
         }
         
-        // 初始化教师端热力图
-        function initTeacherHeatmap() {
-            const container = document.getElementById('heatmap-container');
-            if (!container) return;
-            
-            initHeatmap(); // 复用学生端的热力图代码
-        }
-        
-        // 初始化趋势图
-        function initTrendChart() {
-            const chartDom = document.getElementById('trend-chart');
+        function initAdminUsageChart2() {
+            const chartDom = document.getElementById('admin-usage-chart2');
             if (!chartDom) return;
             
-            const myChart = echarts.init(chartDom);
-            
-            const option = {
-                tooltip: {
-                    trigger: 'axis'
-                },
-                legend: {
-                    data: ['语言流畅度', '逻辑清晰度', '情感表达', '用词准确性', '综合得分']
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: ['9月', '10月', '11月', '12月', '1月', '2月']
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                series: [
-                    {
-                        name: '语言流畅度',
-                        type: 'line',
-                        data: [65, 70, 75, 78, 80, 82],
-                        smooth: true
-                    },
-                    {
-                        name: '逻辑清晰度',
-                        type: 'line',
-                        data: [55, 58, 60, 62, 65, 68],
-                        smooth: true
-                    },
-                    {
-                        name: '情感表达',
-                        type: 'line',
-                        data: [60, 65, 68, 70, 72, 73],
-                        smooth: true
-                    },
-                    {
-                        name: '用词准确性',
-                        type: 'line',
-                        data: [70, 72, 75, 76, 78, 80],
-                        smooth: true
-                    },
-                    {
-                        name: '综合得分',
-                        type: 'line',
-                        data: [62.5, 66.25, 69.5, 71.5, 73.75, 75.75],
-                        smooth: true,
-                        lineStyle: {
-                            width: 3
-                        }
-                    }
-                ]
-            };
-            
-            myChart.setOption(option);
-            
-            window.addEventListener('resize', function() {
-                myChart.resize();
-            });
+            initAdminUsageChart(); // 复用相同的图表
         }
         
-        // 初始化维度分布图
-        function initDimensionChart() {
-            const chartDom = document.getElementById('dimension-chart');
+        function initAdminUserDistributionChart2() {
+            const chartDom = document.getElementById('admin-user-distribution-chart2');
             if (!chartDom) return;
             
-            const myChart = echarts.init(chartDom);
-            
-            const option = {
-                tooltip: {
-                    trigger: 'item'
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left'
-                },
-                series: [
-                    {
-                        name: '学生分布',
-                        type: 'pie',
-                        radius: '50%',
-                        data: [
-                            { value: 8, name: '优秀 (80-100分)' },
-                            { value: 20, name: '良好 (60-80分)' },
-                            { value: 12, name: '需加强 (0-60分)' }
-                        ],
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            };
-            
-            myChart.setOption(option);
-            
-            window.addEventListener('resize', function() {
-                myChart.resize();
-            });
-        }
-        
-        // 初始化使用趋势图
-        function initUsageChart() {
-            const chartDom = document.getElementById('usage-chart');
-            if (!chartDom) return;
-            
-            const myChart = echarts.init(chartDom);
-            
-            const option = {
-                tooltip: {
-                    trigger: 'axis'
-                },
-                legend: {
-                    data: ['活跃用户', '练习次数', '新注册用户']
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
-                    data: ['6月', '7月', '8月', '9月', '10月', '11月']
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                series: [
-                    {
-                        name: '活跃用户',
-                        type: 'line',
-                        data: [320, 432, 501, 634, 790, 892],
-                        smooth: true
-                    },
-                    {
-                        name: '练习次数',
-                        type: 'line',
-                        data: [1200, 1820, 1910, 2340, 2900, 3320],
-                        smooth: true
-                    },
-                    {
-                        name: '新注册用户',
-                        type: 'line',
-                        data: [150, 232, 301, 434, 590, 630],
-                        smooth: true
-                    }
-                ]
-            };
-            
-            myChart.setOption(option);
-            
-            window.addEventListener('resize', function() {
-                myChart.resize();
-            });
-        }
-        
-        // 初始化用户分布图
-        function initUserDistributionChart() {
-            const chartDom = document.getElementById('user-distribution-chart');
-            if (!chartDom) return;
-            
-            const myChart = echarts.init(chartDom);
-            
-            const option = {
-                tooltip: {
-                    trigger: 'item'
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left'
-                },
-                series: [
-                    {
-                        name: '用户类型',
-                        type: 'pie',
-                        radius: '50%',
-                        data: [
-                            { value: 892, name: '学生' },
-                            { value: 245, name: '教师' },
-                            { value: 121, name: '管理员' }
-                        ],
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            };
-            
-            myChart.setOption(option);
-            
-            window.addEventListener('resize', function() {
-                myChart.resize();
-            });
-        }
-        
-        // 初始化场景排行图
-        function initSceneRankingChart() {
-            const chartDom = document.getElementById('scene-ranking-chart');
-            if (!chartDom) return;
-            
-            const myChart = echarts.init(chartDom);
-            
-            const option = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                },
-                grid: {
-                    left: '3%',
-                    right: '4%',
-                    bottom: '3%',
-                    containLabel: true
-                },
-                xAxis: {
-                    type: 'value'
-                },
-                yAxis: {
-                    type: 'category',
-                    data: ['求职面试', '小组讨论', '景点讲解', '家庭沟通', '校园演讲']
-                },
-                series: [
-                    {
-                        name: '使用次数',
-                        type: 'bar',
-                        data: [520, 632, 701, 834, 1258],
-                        itemStyle: {
-                            color: function(params) {
-                                const colorList = ['#c23531','#2f4554', '#61a0a8', '#d48265', '#91c7ae'];
-                                return colorList[params.dataIndex];
-                            }
-                        }
-                    }
-                ]
-            };
-            
-            myChart.setOption(option);
-            
-            window.addEventListener('resize', function() {
-                myChart.resize();
-            });
-        }
-        
-        // 初始化地域分布图
-        function initRegionDistributionChart() {
-            const chartDom = document.getElementById('region-distribution-chart');
-            if (!chartDom) return;
-            
-            const myChart = echarts.init(chartDom);
-            
-            const option = {
-                tooltip: {
-                    trigger: 'item'
-                },
-                series: [
-                    {
-                        name: '用户分布',
-                        type: 'pie',
-                        radius: ['40%', '70%'],
-                        avoidLabelOverlap: false,
-                        itemStyle: {
-                            borderRadius: 10,
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        },
-                        label: {
-                            show: false,
-                            position: 'center'
-                        },
-                        emphasis: {
-                            label: {
-                                show: true,
-                                fontSize: '18',
-                                fontWeight: 'bold'
-                            }
-                        },
-                        labelLine: {
-                            show: false
-                        },
-                        data: [
-                            { value: 435, name: '南宁市' },
-                            { value: 310, name: '柳州市' },
-                            { value: 234, name: '桂林市' },
-                            { value: 135, name: '梧州市' },
-                            { value: 144, name: '其他地区' }
-                        ]
-                    }
-                ]
-            };
-            
-            myChart.setOption(option);
-            
-            window.addEventListener('resize', function() {
-                myChart.resize();
-            });
+            initAdminUserDistributionChart(); // 复用相同的图表
         }
     </script>
 </body>
